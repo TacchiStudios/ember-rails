@@ -52,13 +52,17 @@ module Ember
         ember_data_ext = variant == :production ? ".prod.js" : ".js"
         FileUtils.cp(::Ember::Data::Source.bundled_path_for("ember-data#{ember_data_ext}"), tmp_path.join("ember-data.js"))
 
-        app.assets.append_path(tmp_path)
+        config.assets.configure do |env|
+          env.append_path(tmp_path)
+        end
       end
 
       initializer "ember_rails.setup_vendor", :after => "ember_rails.copy_vendor_to_local", :group => :all do |app|
-        app.assets.append_path(::Ember::Source.bundled_path_for(nil))
-        app.assets.append_path(::Ember::Data::Source.bundled_path_for(nil))
-        app.assets.append_path(File.expand_path('../', ::Handlebars::Source.bundled_path)) if defined?(::Handlebars::Source)
+        config.assets.configure do |env|
+          env.append_path(::Ember::Source.bundled_path_for(nil))
+          env.append_path(::Ember::Data::Source.bundled_path_for(nil))
+          env.append_path(File.expand_path('../', ::Handlebars::Source.bundled_path)) if defined?(::Handlebars::Source)
+        end
       end
 
       initializer "ember_rails.es5_default", :group => :all do |app|
